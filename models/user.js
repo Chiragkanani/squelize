@@ -47,7 +47,8 @@ module.exports = (sequelize,DataTypes)=>{
                 // Other model options go here
                 // timestamps: false,
                 // createdAt:false,
-                // updatedAt:"updated_at"
+                // updatedAt:"updated_at",
+                paranoid:true
             },
         );
         return User

@@ -22,4 +22,5 @@ app.get("/rowquery",userController().rowQuery);
 app.get("/one-to-one",userController().oneToOneUser);
 app.get("/one-to-many",userController().oneToManyUser);
 app.get("/many-to-many",userController().manyToMany);
+app.get("/eagerloading",userController().eagerLoading);
 app.listen(3000);

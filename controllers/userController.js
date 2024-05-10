@@ -1,6 +1,7 @@
 const db = require("../models/index")
 const User = db.user;
 const Contact = db.contact
+const Education = db.education
 const { Op,QueryTypes } = require('sequelize');
 const userController = ()=>{
     return {
@@ -48,7 +49,8 @@ const userController = ()=>{
                     // order:[["id","DESC"]],
                     group:"id",
                     // offset:2,
-                    // limit:2
+                    // limit:2,
+                    // paranoid:false  //for soft deleted data
 
                 });
                 return res.json(users)
@@ -68,7 +70,16 @@ const userController = ()=>{
         },
         async deleteUser(req,res){
             try {
-                let result = await User.destroy({where:{id:req.params.id}});
+                let result = await User.destroy({
+                    where:{id:req.params.id},
+                    // force:true     // for soft delete
+                });
+
+                //restore data = make deletedAt isnull  
+                // await User.restore({
+                //     where: { id: req.params.id },
+                // });
+
                 res.json(result)
             } catch (error) {
                 console.log(error)
@@ -120,27 +131,27 @@ const userController = ()=>{
         },
         async oneToOneUser(req,res){
             try {
-                // let data = await User.create({
-                //     firstName:"MANISH",
-                //     lastName:"Upadhyay",
-                //     email:"hello1@gmail.com"
-                // });
-                // let contactDetail
-                // if (data && data.id) {
-                //      contactDetail = await Contact.create({
-                //         permanent_address:"Bhvsnshr",
-                //         current_address:"sihor",
-                //         UserId:data.id
-                //     });
-                // }
-                let data = await User.findAll({
-                    include:[{
-                        model:Contact,
-                        as:"contactDetails",
-                        // attributes:["permanent_address","current_address"],
-                        // where:{id:2}
-                    }],
+                let data = await User.create({
+                    firstName:"Chirag",
+                    lastName:"Kanani",
+                    email:"hello2@gmail.com"
                 });
+                let contactDetail
+                if (data && data.id) {
+                     contactDetail = await Contact.create({
+                        permanent_address:"Bhvsnshr",
+                        current_address:"sihor",
+                        UserId:data.id
+                    });
+                }
+                // let data = await User.findAll({
+                //     include:[{
+                //         model:Contact,
+                //         as:"contactDetails",
+                //         // attributes:["permanent_address","current_address"],
+                //         // where:{id:2}
+                //     }],
+                // });
 
 
                 // let data = await Contact.findAll({
@@ -187,10 +198,37 @@ const userController = ()=>{
             let data = await Contact.findAll({
                 include:[{
                     model:User,
+                    through:{
+                        attributes:[]
+                    }
                 }],
-                
             })
             return res.json(data)
+        },
+        async eagerLoading(req,res){
+            try {
+                let data = await User.findAll({
+                    // include:{all:true,nested:true},
+                    include: [{
+                        model: Contact,
+                        as:"contactDetails",
+                        include:{
+                            model:Education
+                        }
+                        // required:true,
+                        // right:true
+                    },
+                    // {
+                    //     model:Education,
+                    //     as:"educationDetails"
+                    // }
+                ]
+                })
+                res.json({ data })
+            } catch (error) {
+                console.log(error)
+            }
+           
         }
     }
 }
