@@ -17,5 +17,9 @@ app.get("/users/:id",userController().getSingleUser);
 app.delete("/users/:id",userController().deleteUser);
 app.put("/users/:id",userController().updateUser);
 app.get("/findorcreate",userController().findOrCreate);
-app.get("/get-set-virtual",userController().getSetVirtual)
+app.get("/get-set-virtual",userController().getSetVirtual);
+app.get("/rowquery",userController().rowQuery);
+app.get("/one-to-one",userController().oneToOneUser);
+app.get("/one-to-many",userController().oneToManyUser);
+app.get("/many-to-many",userController().manyToMany);
 app.listen(3000);

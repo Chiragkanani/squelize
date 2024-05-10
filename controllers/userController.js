@@ -1,29 +1,35 @@
 const db = require("../models/index")
-const User = db.user
-const { Op } = require('sequelize');
+const User = db.user;
+const Contact = db.contact
+const { Op,QueryTypes } = require('sequelize');
 const userController = ()=>{
     return {
+        
         async addUser(req,res){
-            let jane;
-            if (Array.isArray(req.body)) {
-                 jane = await User.bulkCreate(req.body);
-            }else{
-                 jane = await User.create(req.body,{
-                    // fields:['firstName']
-                });
+            try {
+                let jane;
+                if (Array.isArray(req.body)) {
+                     jane = await User.bulkCreate(req.body);
+                }else{
+                     jane = await User.create(req.body,{
+                        // fields:['firstName']
+                    });
+                }
+    
+               
+                // jane.set(
+                //     { firstName: "Jane",
+                //         lastName:"Kanani"
+                //      }
+                // );
+                // await jane.save();
+                // await jane.destroy();
+                // await jane.reload()
+                // console.log(jane.lastName);
+                return res.json(jane)
+            } catch (error) {
+                console.log(error)
             }
-
-           
-            // jane.set(
-            //     { firstName: "Jane",
-            //         lastName:"Kanani"
-            //      }
-            // );
-            // await jane.save();
-            // await jane.destroy();
-            // await jane.reload()
-            // console.log(jane.lastName);
-            return res.json(jane)
         },
         async getUser(req,res){
             try {
@@ -96,6 +102,95 @@ const userController = ()=>{
             } catch (error) {
                 console.log(error)
             }
+        },
+        async rowQuery(req,res){
+            try {
+                const results = await db.sequelize.query('select * from Users where id in(?)',
+                {
+                    type: QueryTypes.SELECT,
+                    replacements:[[1,3,4]],
+                    model: User,
+                    mapToModel: true,
+                    // plain:true
+                });
+                return res.json({results})
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async oneToOneUser(req,res){
+            try {
+                // let data = await User.create({
+                //     firstName:"MANISH",
+                //     lastName:"Upadhyay",
+                //     email:"hello1@gmail.com"
+                // });
+                // let contactDetail
+                // if (data && data.id) {
+                //      contactDetail = await Contact.create({
+                //         permanent_address:"Bhvsnshr",
+                //         current_address:"sihor",
+                //         UserId:data.id
+                //     });
+                // }
+                let data = await User.findAll({
+                    include:[{
+                        model:Contact,
+                        as:"contactDetails",
+                        // attributes:["permanent_address","current_address"],
+                        // where:{id:2}
+                    }],
+                });
+
+
+                // let data = await Contact.findAll({
+                //     include:[{
+                //         model:User,
+                //         as:"UserDetails",
+                //         // attributes:["permanent_address","current_address"],
+                //         // where:{id:2}
+                //     }],
+                // });
+                return res.json({data})
+            } catch (error) {
+                console.log(error)
+            }
+            
+        },
+        async oneToManyUser(req,res){
+            try {
+                //  let contactDetail = await Contact.create({
+                //         permanent_address:"Bhvsnshr",
+                //         current_address:"sihor",
+                //         UserId:1
+                //     });
+
+                let data = await User.findAll({
+                    include:[{
+                        model:Contact,
+                        as:"contactDetails",
+                    }]
+                })
+                
+                return res.json({data})
+            } catch (error) {
+                console.log(error)
+            }
+            
+        },
+        async manyToMany(req,res){
+            // let data = await User.findAll({
+            //     include:[{
+            //         model:Contact
+            //     }]
+            // })
+            let data = await Contact.findAll({
+                include:[{
+                    model:User,
+                }],
+                
+            })
+            return res.json(data)
         }
     }
 }

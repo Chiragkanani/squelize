@@ -16,11 +16,16 @@ try {
     const db= {};
     db.sequelize = sequelize;
     db.Sequelize = Sequelize;
-    db.contact = require("./contact")(sequelize,DataTypes);
     db.user = require("./user")(sequelize,DataTypes);
+    db.contact = require("./contact")(sequelize,DataTypes);
     
-    
-    db.sequelize.sync()
+    // db.user.hasMany(db.contact,{foreignKey:"UserId", as:"contactDetails"});
+    // db.contact.belongsTo(db.user,{foreignKey:"UserId", as:"UserDetails"});
+    db.usercontact = require("./userContact")(sequelize,DataTypes,db.user,db.contact)
+    db.user.belongsToMany(db.contact, { through: db.usercontact });
+    db.contact.belongsToMany(db.user, { through: db.usercontact });
+
+    db.sequelize.sync({alter:true})
     module.exports = db; 
 } catch (error) {
     console.log(error)

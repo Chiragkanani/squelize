@@ -11,6 +11,11 @@ module.exports = (sequelize,DataTypes)=>{
                     get() {
                         return  "Mr."+ this.getDataValue('firstName').toUpperCase();
                       },
+                      validate:{
+                        // isNumeric:{msg:"Only Numeric allowed chirag"},
+                        // max:10,
+                        len:{args:[2,10],msg:"Length between 2 , 10"}
+                      }
                 },
                 lastName: {
                     type: DataTypes.STRING,
@@ -19,6 +24,14 @@ module.exports = (sequelize,DataTypes)=>{
                         this.setDataValue('lastName', value+", Indians");
                       }
                     // allowNull defaults to true
+                },
+                email:{
+                    type:DataTypes.STRING,
+                    unique:true,
+                    allowNull:false,
+                    validate:{
+                        isEmail:true
+                    }
                 },
                 fullName: {
                     type: DataTypes.VIRTUAL,
