@@ -12,5 +12,7 @@ app.get("/",(req,res)=>{
 })
 
 app.post("/adduser",userController().addUser)
-
+app.get("/users",userController().getUser)
+app.get("/users/:id",userController().getSingleUser);
+app.delete("/users/:id",userController().deleteUser);
 app.listen(3000);
